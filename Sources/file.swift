@@ -6,7 +6,11 @@
 //  Copyright © 2015 Johannes Schriewer. All rights reserved.
 //
 
-import Darwin
+#if os(Linux)
+    import Glibc
+#else
+    import Darwin
+#endif
 
 public enum FileMode: String {
     case ReadOnly      = "rb"
@@ -84,7 +88,7 @@ public class File: OutputStreamType {
         let written = fwrite(string, 1, bytes, self.fp)
         if bytes != written {
             // This protocol is dumb because it does not allow error return
-            Log.error("IO error while writing to '\(self.filename)'!")
+            // Log.error("IO error while writing to '\(self.filename)'!")
         }
     }
     
@@ -99,7 +103,7 @@ public class File: OutputStreamType {
     public func read(size: Int) throws -> String? {
         var buffer:[UInt8] = try self.read(size)
         buffer.append(0)
-        return String(CString: UnsafePointer<CChar>(buffer), encoding: NSUTF8StringEncoding)
+        return String.fromCString(UnsafePointer<CChar>(buffer))
     }
     
     public func read(size: Int) throws -> [UInt8] {
@@ -145,7 +149,7 @@ public class File: OutputStreamType {
         
         
         buffer.append(0)
-        return String(CString: UnsafePointer<CChar>(buffer), encoding: NSUTF8StringEncoding)
+        return String.fromCString(UnsafePointer<CChar>(buffer))
     }
 }
 
