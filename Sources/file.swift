@@ -21,13 +21,13 @@ public enum FileMode: String {
 }
 
 
-public class File: OutputStreamType {
+public class File: OutputStream {
     private var fp: UnsafeMutablePointer<FILE> = nil
     private let closeWhenDeallocated: Bool
     
     public let filename: String?
     
-    public enum Error: ErrorType {
+    public enum Error: ErrorProtocol {
         case FileNotFound
         case IOError
         case EndOfFile
@@ -103,11 +103,11 @@ public class File: OutputStreamType {
     public func read(size: Int) throws -> String? {
         var buffer:[UInt8] = try self.read(size)
         buffer.append(0)
-        return String.fromCString(UnsafePointer<CChar>(buffer))
+        return String(validatingUTF8: UnsafePointer<CChar>(buffer))
     }
     
     public func read(size: Int) throws -> [UInt8] {
-        let buffer = [UInt8](count: size, repeatedValue: 0)
+        let buffer = [UInt8](repeating: 0, count: size)
         let read = fread(UnsafeMutablePointer(buffer), 1, size, self.fp)
         guard read == size else {
             if feof(self.fp) == 0 {
@@ -149,7 +149,7 @@ public class File: OutputStreamType {
         
         
         buffer.append(0)
-        return String.fromCString(UnsafePointer<CChar>(buffer))
+        return String(validatingUTF8: UnsafePointer<CChar>(buffer))
     }
 }
 

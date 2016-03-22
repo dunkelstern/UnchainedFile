@@ -1,0 +1,36 @@
+(package
+  :name "unchainedfile"
+  
+  :tasks {
+    :default {
+      :tool "atllbuild"
+      :sources ["Sources/**.swift"]
+      :name "UnchainedFile"
+      :output-type "static-library"
+      :publish-product true
+      :compile-options ["-enable-testing"]
+    }
+
+    :check {
+      :tool "nop"
+      :dependencies ["run-tests"]
+    }
+
+    :build-tests {
+      :tool "atllbuild"
+      :sources ["Tests/**.swift"]
+      :output-type "executable"
+      :name "tests"
+      :dependencies ["default"]
+      :xctestify true
+      :xctest-strict true
+      :link-with ["UnchainedFile.a"]
+    }
+
+    :run-tests {
+      :tool "xctestrun"
+      :test-executable ".atllbuild/products/tests"
+      :dependencies ["build-tests"]
+    }
+  }
+)
